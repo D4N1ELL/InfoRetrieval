@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Engine</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 1rem 0;
+            text-align: center;
+        }
+        main {
+            margin: 2rem auto;
+            max-width: 800px;
+            padding: 1rem;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        input[type="text"] {
+            padding: 0.5rem;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            padding: 0.5rem;
+            font-size: 1rem;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .results {
+            margin-top: 2rem;
+        }
+        .result {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .result img {
+            width: 150px;
+            height: auto;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+        .result-details {
+            flex: 1;
+        }
+        .result-details h3 {
+            margin: 0;
+            font-size: 1.2rem;
+            color: #333;
+        }
+        .result-details p {
+            margin: 0.3rem 0;
+            font-size: 0.9rem;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Car Search Engine</h1>
+    </header>
+    <main>
+        <form id="search-form">
+            <label for="query">Enter your query:</label>
+            <input type="text" id="query" name="query" placeholder="e.g., Toyota Sedan" required>
+            <button type="submit">Search</button>
+        </form>
+
+        <div id="results" class="results"></div>
+    </main>
+
+
+
+<script>
+    document.getElementById("search-form").addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const query = document.getElementById("query").value;
+
+        const response = await fetch("/search", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: `query=${encodeURIComponent(query)}`
+        });
+
+        const data = await response.json();
+        const resultsDiv = document.getElementById("results");
+        resultsDiv.innerHTML = `<h2>Results for: "${data.query}"</h2>`;
+
+        if (data.boolean_results.length > 0) {
+            resultsDiv.innerHTML += `<h3>Boolean Search Results:</h3>`;
+            data.boolean_results.forEach(result => {
+                resultsDiv.innerHTML += `
+                    <div class="result">
+                        <img src="${result.ImageURL}" alt="${result.Make} ${result.Model}">
+                        <div class="result-details">
+                            <h3>${result.Make} ${result.Model} (${result.Year})</h3>
+                            <p><strong>Type:</strong> ${result.Type}</p>
+                            <p><strong>Fuel:</strong> ${result.Fuel}</p>
+                            <p><strong>Price:</strong> $${result.Price}</p>
+                            <p><strong>Horsepower:</strong> ${result.Horsepower} HP</p>
+                            <p><strong>Drive:</strong> ${result.Drive}</p>
+                            <p><strong>Interior:</strong> ${result.Interior}</p>
+                        </div>
+                    </div>`;
+            });
+        }
+
+        // TF-IDF Results
+        if (data.tfidf_results.length > 0) {
+            resultsDiv.innerHTML += `<h3>TF-IDF Ranked Results:</h3>`;
+            data.tfidf_results.forEach(result => {
+                resultsDiv.innerHTML += `
+                    <div class="result">
+                        <img src="${result.data.ImageURL}" alt="${result.data.Make} ${result.data.Model}">
+                        <div class="result-details">
+                            <h3>${result.data.Make} ${result.data.Model} (${result.data.Year})</h3>
+                            <p><strong>Score:</strong> ${result.score.toFixed(2)}</p>
+                        </div>
+                    </div>`;
+            });
+        }
+
+        // BM25 Results
+        if (data.bm25_results.length > 0) {
+            resultsDiv.innerHTML += `<h3>BM25 Ranked Results:</h3>`;
+            data.bm25_results.forEach(result => {
+                resultsDiv.innerHTML += `
+                    <div class="result">
+                        <img src="${result.data.ImageURL}" alt="${result.data.Make} ${result.data.Model}">
+                        <div class="result-details">
+                            <h3>${result.data.Make} ${result.data.Model} (${result.data.Year})</h3>
+                            <p><strong>Score:</strong> ${result.score.toFixed(2)}</p>
+                        </div>
+                    </div>`;
+            });
+        }
+    });
+</script>
+</body>
+</html>
