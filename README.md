@@ -73,6 +73,18 @@ The dataset is preprocessed and stored in `cars.json`, including attributes like
 - View Boolean search results alongside ranked results using TF-IDF and BM25.
 - Click on images for a better visual representation of the car.
 
+---
+
+## Screenshots
+
+### Home Page
+![Home Page](images/homepage.png)
+
+### Search Results
+![Search Results](images/search_results.png)
+
+### Detailed Car View
+![Combined Search](images/combined_search.png)
 
 ---
 
