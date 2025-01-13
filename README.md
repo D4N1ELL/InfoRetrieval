@@ -42,9 +42,6 @@ The dataset is preprocessed and stored in `cars.json`, including attributes like
 
 ## Installation
 1. Clone the repository:
-   ```bash
-   git clone https://github.com/your-username/car-finder-search-engine.git
-   ```
 
 2. Navigate to the project directory:
    ```bash
